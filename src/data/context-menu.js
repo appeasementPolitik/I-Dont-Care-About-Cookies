@@ -285,29 +285,34 @@ function reportWebsite(info, tab)
 
 function activateDomain(hostname, tabId, frameId)
 {
+	
 	if (!cached_rules[hostname])
 		cached_rules[hostname] = rules[hostname] || {};
 	
 	if (!cached_rules[hostname])
 		return false;
 	
-	let r = cached_rules[hostname],
+	let cached_rule = cached_rules[hostname],
 		status = false;
+
+	// cached_rule.s = Custom css for webpage
+	// cached_rule.c = Common css for webpage
+	// cached_rule.j = Common js  for webpage
 	
-	if (typeof r.s != 'undefined') {
-		chrome.tabs.insertCSS(tabId, {code: r.s, frameId: frameId, matchAboutBlank: true, runAt: 'document_start'});
+	if (typeof cached_rule.s != 'undefined') {
+		chrome.tabs.insertCSS(tabId, {code: cached_rule.s, frameId: frameId, matchAboutBlank: true, runAt: 'document_start'});
 		status = true;
 	}
-	else if (typeof r.c != 'undefined') {
-		chrome.tabs.insertCSS(tabId, {code: commons[r.c], frameId: frameId, matchAboutBlank: true, runAt: 'document_start'});
+	else if (typeof cached_rule.c != 'undefined') {
+		chrome.tabs.insertCSS(tabId, {code: commons[cached_rule.c], frameId: frameId, matchAboutBlank: true, runAt: 'document_start'});
 		status = true;
 	}
 	
-	if (typeof r.j != 'undefined') {
-		chrome.tabs.executeScript(tabId, {file: 'data/js/'+(r.j > 0 ? 'common'+r.j : hostname)+'.js', frameId: frameId, matchAboutBlank: true, runAt: 'document_end'});
+	if (typeof cached_rule.j != 'undefined') {
+		chrome.tabs.executeScript(tabId, {file: 'data/js/'+(cached_rule.j > 0 ? 'common'+cached_rule.j : hostname)+'.js', frameId: frameId, matchAboutBlank: true, runAt: 'document_end'});
 		status = true;
 	}
-	
+
 	return status;
 }
 
